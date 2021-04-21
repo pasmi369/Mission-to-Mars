@@ -1,67 +1,128 @@
-# Import Splinter and BeautifulSoup
-import pandas as pd
 
+# Import Splinter, BeautifulSoup, and Pandas
 from splinter import Browser
 from bs4 import BeautifulSoup as soup
+import pandas as pd
+import datetime as dt
 from webdriver_manager.chrome import ChromeDriverManager
 
-# ### WEB SCRAPING
-#Set up Splinter
+# Set up splinter and scrape_all()
+def scrape_all():
 
-executable_path = {'executable_path': ChromeDriverManager().install()}
-browser = Browser('chrome', **executable_path, headless=False)
+    # Set the executable path and initialize Splinter
+    executable_path = {'executable_path': ChromeDriverManager().install()}
+    browser = Browser('chrome', **executable_path)
+    news_title, news_paragraph = mars_news(browser)
+    
+    # Run all scraping functions and store results in a dictionary
+    data = {
+        "news_title": news_title,
+        "news_paragraph": news_paragraph,
+        "featured_image": featured_image(browser),
+        "facts": mars_facts(),
+        "hemispheres": hemisphere(browser),
+        #"last_modified": dt.datetime.now()
+    }
 
-# ### TEXT/ARTICLE SCRAPING
+    # Stop webdriver and return data
+    browser.quit()
+    return data
 
-# Visit the mars nasa news site
-url = 'https://redplanetscience.com'
-browser.visit(url)
+# ###Scrape Mars News
+def mars_news(browser):
+    # Visit the mars nasa news site
+    url = 'https://data-class-mars.s3.amazonaws.com/Mars/index.html'
+    browser.visit(url)
+    
+    # Optional delay for loading the page
+    browser.is_element_present_by_css('div.list_text', wait_time=1)
+    
+    # Convert the browser html to a soup object and then quit the browser
+    html = browser.html
+    news_soup = soup(html, 'html.parser')
+    
+    # Add try/except for error handling
+    try:
+        slide_elem = news_soup.select_one('div.list_text')
+        
+        # Use the parent element to find the first 'a' tag and save it as 'news_title'
+        news_title = slide_elem.find('div', class_='content_title').get_text()
+        
+        # Use the parent element to find the paragraph text
+        news_p = slide_elem.find('div', class_='article_teaser_body').get_text()
+    except AttributeError:
+        return None, None
+    return news_title, news_p
 
-# Optional delay for loading the page
-browser.is_element_present_by_css('div.list_text',wait_time=1)
+# ### JPL Space Images Featured Image
+def featured_image(browser):
+    # Visit URL
+    url = 'https://data-class-jpl-space.s3.amazonaws.com/JPL_Space/index.html'
+    browser.visit(url)
+    
+    # Find and click the full image button
+    full_image_elem = browser.find_by_tag('button')[1]
+    full_image_elem.click()
+    
+    # Parse the resulting html with soup
+    html = browser.html
+    img_soup = soup(html, 'html.parser')
+     
+    # Add try/except for error handling
+    try:
+        # find the relative image url
+        img_url_rel = img_soup.find('img', class_='fancybox-image').get('src')   
+    except AttributeError:
+        return None
+    
+    # Use the base url to create an absolute url
+    img_url = f'https://data-class-jpl-space.s3.amazonaws.com/JPL_Space/{img_url_rel}'        
+    return img_url
 
-#convert the browser html to a soup object
-html = browser.html
-news_soup = soup(html, 'html.parser')
-slide_elem = news_soup.select_one('div.list_text')
-slide_elem.find('div', class_='content_title')
+# ### Mars Facts
+def mars_facts():
+    # Add try/except for error handling
+    try:
+        # use 'read_html" to scrape the facts table into a dataframe
+        df = pd.read_html('https://data-class-mars-facts.s3.amazonaws.com/Mars_Facts/index.html')[0]
+    except BaseException:
+        return None
+    
+    # Assign columns and set index of dataframe
+    df.columns=['Description', 'Mars', 'Earth']
+    df.set_index('Description', inplace=True)
+    
+    # Convert dataframe into HTML format, add bootstrap
+    return df.to_html(classes="table table-striped")
 
-# Use the parent element to find the first `a` tag and save it as `news_title`
-news_title = slide_elem.find('div', class_='content_title').get_text()
-news_title
+# # D2: Update the Web App with Mars’s Hemisphere Images and Titles
 
-# Use the parent element to find the paragraph text
-news_p = slide_elem.find('div', class_='article_teaser_body').get_text()
-news_p
+# ### Hemispheres
+def hemisphere(browser):
+    # 1.Use browser to visit the URL
+    url = 'https://data-class-mars-hemispheres.s3.amazonaws.com/Mars_Hemispheres/index.html'
+    browser.visit(url)
 
-# ### FEATURED IMAGE SCRAPING
+    # 2.Create a list to hold the images and titles.
+    hemisphere_image_urls = []
 
-# Visit URL
-url = 'https://spaceimages-mars.com'
-browser.visit(url)
+    # 3. Write code to retrieve the image urls and titles for each hemisphere.
+    for i in range (4):
+        hemisphere={}
+        browser.find_by_css("a.product-item img")[i].click()
+        html = browser.html
+        news_soup = soup(html, 'html.parser')
+        title=news_soup.find("h2", class_="title").get_text()
+        sample=news_soup.find("a", text="Sample").get('href')
+        full_link= 'https://data-class-mars-hemispheres.s3.amazonaws.com/Mars_Hemispheres/'+sample
+        hemisphere["img_url"]=full_link
+        hemisphere["title"]=title
+        hemisphere_image_urls.append(hemisphere)
+        browser.back()
 
-# Find and click the full image button
-full_image_elem = browser.find_by_tag('button')[1]
-full_image_elem.click()
+    # 4. Print the list that holds the dictionary of each image url and title.
+    return hemisphere_image_urls
 
-# Parse the resulting html with soup
-html = browser.html
-img_soup = soup(html, 'html.parser')
-
-# Find the relative image url
-img_url_rel = img_soup.find('img', class_='fancybox-image').get('src')
-img_url_rel
-
-# Use the base URL to create an absolute URL
-img_url = f'https://spaceimages-mars.com/{img_url_rel}'
-img_url
-
-#Scrapping entire table using pandas .read_html( )function.
-df = pd.read_html('https://galaxyfacts-mars.com')[0]
-df.columns=['description', 'Mars', 'Earth']
-df.set_index('description', inplace=True)
-df
-
-df.to_html()
-
-browser.quit()
+# Tell Flask to run
+if __name__ == "__main__":
+    print(scrape_all())
