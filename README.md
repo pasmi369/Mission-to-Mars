@@ -21,8 +21,10 @@ This project scrapes data from various websites to create an new webpagen named 
 
 ### Deliverable 3:
 - Add two additional Bootstrap 3 Components to style the webpage and mobile-responsive
-![Toggle device toolbar](./Resoures/toggle_device_toolbar.png)
+![Toggle device toolbar](./Resources/toggle_device_toolbar.png)
 
 
 ## Summary:
+- In this project, a web browser is automated to visit different NASA/gov websites to extract data about the "Mission to Mars". Scraped data was stored in a NoSQL database, and then rendered in a web application created with Flask. Latest Mars News, Featured Mars Image, Mars Facts and the images of four Mars Hemispheres have also been included in the web page in just a click on Scrape new Data button.
+
 ![Webpage Bootsrap](./Resources/webpage_bootstrap.png)
