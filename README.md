@@ -14,14 +14,14 @@ This project scrapes data from various websites to create an new webpagen named 
 - Scrape Full-Resolution Mars Hemisphere Images and Titles
 ![hemisphere_image_urls](./Resources/hemisphere_image_urls.png)
 
-![District_Summary](./Resources/District_Summary.png)
+
 ### Deliverable 2:
 - Update the Web App with Mars Hemisphere Images and Titles
-
+![full_image_titles](./Resources/full_image_titles.png)
 
 ### Deliverable 3:
 - Add two additional Bootstrap 3 Components to style the webpage and mobile-responsive
--
+![Webpage Bootsrap](./Resources/webpage_bootstrap.png)
 
 
 ## Summary:
