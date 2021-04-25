@@ -61,7 +61,25 @@
         </div>
 
         {% for hemisphere in mars.hemispheres %}
-        <!-- <div class="col-md-6"> -->
+        <div class="col-md-6">
+          <!-- <div class="col-md-3 col-sm-6 col-xs-12"> -->
+          <div class="thumbnail">
+            <img src="{{hemisphere.img_url | default('static/images/error.png', true)}}" alt="...">
+            <div class="caption">
+              <h4>{{hemisphere.title}}</h4>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+        <!-- !-- Section for Mars Hemispheres -->
+        <div class="row" id="mars-hemispheres">
+          <div class="page-header">
+            <h2 class="text-center">Mars Hemispheres</h2>
+          </div>
+
+          {% for hemisphere in mars.hemispheres %}
+          <!-- <div class="col-md-6"> -->
           <div class="col-md-3 col-sm-6 col-xs-12">
             <div class="thumbnail">
               <img src="{{hemisphere.img_url | default('static/images/error.png', true)}}" alt="...">
@@ -69,9 +87,9 @@
                 <h4>{{hemisphere.title}}</h4>
               </div>
             </div>
+          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
-      </div>
     </div>
   </body>
 </html>
