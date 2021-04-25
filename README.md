@@ -21,9 +21,13 @@ This project scrapes data from various websites to create an new webpagen named 
 
 ### Deliverable 3:
 - Add two additional Bootstrap 3 Components to style the webpage and mobile-responsive
-  - Toggle Device toolbar
+
+  - ### Toggle Device toolbar
+  
 ![Toggle device toolbar](./Resources/toggle_device_toolbar.png)
-  - Additional Bootstrap 3 components
+
+  - ### Additional Bootstrap 3 components
+
 ![full_image_titles](./Resources/full_image_titles.png)
 
 
